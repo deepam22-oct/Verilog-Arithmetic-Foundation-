@@ -123,4 +123,45 @@ module cla_16bit_block (
     assign p_out = p1 & p0;
  
 endmodule
+
+// ------------------------ 32 -BIT CLA (TOP CLA ) USING 2 16-BIT CLA ------------------
+module cla_adder_32bit (
+    input [31:0] a,
+    input [31:0] b,
+    input cin,
+    output [31:0] sum,
+    output cout,
+    output zero_flag,
+    output overflow_flag
+);
  
+    wire c16;
+    wire g0, p0;
+    wire g1, p1;
+    
+    // Lower 16-bit CLA block
+    cla_16bit_block cla0 (
+        .a(a[15:0]),
+        .b(b[15:0]),
+        .cin(cin),
+        .sum(sum[15:0]),
+        .cout(c16),
+        .g_out(g0),
+        .p_out(p0)
+    );
+    
+    // Upper 16-bit CLA block
+    cla_16bit_block cla1 (
+        .a(a[31:16]),
+        .b(b[31:16]),
+        .cin(c16),
+        .sum(sum[31:16]),
+        .cout(cout),
+        .g_out(g1),
+        .p_out(p1)
+    );
+    
+    assign zero_flag = (sum == 32'h0);
+    assign overflow_flag = (a[31] == b[31]) & (a[31] != sum[31]);
+ 
+endmodule
