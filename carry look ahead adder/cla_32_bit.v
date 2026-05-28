@@ -35,3 +35,49 @@ module cla_4bit (
   assign p_out = p[0] & p[1] & p[2] & p[3] ;
   
 endmodule
+
+
+// ---------------- 8 - BIT CLA USING 2 4 BIT CLA -------------------
+
+module cla_8bit_block (
+    input  [7:0] a,
+    input  [7:0] b,
+    input  cin,
+
+    output [7:0] sum,
+    output cout,
+    output g_out,
+    output p_out
+);
+
+    wire c4;
+    wire g0, p0;
+    wire g1, p1;
+
+    cla_4bit cla1 (
+        .a(a[3:0]),
+        .b(b[3:0]),
+        .cin(cin),
+        .sum(sum[3:0]),
+        .cout(c4),
+        .g_out(g0),
+        .p_out(p0)
+    );
+
+    // Upper 4-bit CLA
+    cla_4bit cla2 (
+        .a(a[7:4]),
+        .b(b[7:4]),
+        .cin(c4),
+        .sum(sum[7:4]),
+        .cout(),
+        .g_out(g1),
+        .p_out(p1)
+    );
+
+    
+    assign cout  = g1 | (p1 & g0) | (p1 & p0 & cin);
+    assign g_out = g1 | (p1 & g0);
+    assign p_out = p1 & p0;
+
+endmodule
