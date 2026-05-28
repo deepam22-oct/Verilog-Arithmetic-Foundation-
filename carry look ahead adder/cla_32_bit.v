@@ -81,3 +81,46 @@ module cla_8bit_block (
     assign p_out = p1 & p0;
 
 endmodule
+
+// ------------ 16-BIT CLA USING 2 8-BIT CLA -----------------------
+
+module cla_16bit_block (
+    input [15:0] a,
+    input [15:0] b,
+    input cin,
+    output [15:0] sum,
+    output cout,
+    output g_out,
+    output p_out
+);
+ 
+    wire c8;
+    wire g0, p0;
+    wire g1, p1;
+    
+    cla_8bit_block cla0 (
+        .a(a[7:0]),
+        .b(b[7:0]),
+        .cin(cin),
+        .sum(sum[7:0]),
+        .cout(c8),
+        .g_out(g0),
+        .p_out(p0)
+    );
+    
+    cla_8bit_block cla1 (
+        .a(a[15:8]),
+        .b(b[15:8]),
+        .cin(c8),
+        .sum(sum[15:8]),
+        .cout(),
+        .g_out(g1),
+        .p_out(p1)
+    );
+    
+    assign cout = g1 | (p1 & g0) | (p1 & p0 & cin);
+    assign g_out = g1 | (p1 & g0);
+    assign p_out = p1 & p0;
+ 
+endmodule
+ 
